@@ -1,6 +1,7 @@
 // content.js — runs on https://radio-podcast.fr/podcast/*
-// Injects a floating "Télécharger tous les épisodes" button and handles
-// extraction + dispatch of mp3 downloads to the background service worker.
+// Injects a floating "Télécharger tous les épisodes" button. On click, sends
+// the extracted episode list to the background service worker, which opens
+// the dedicated downloader page in a new tab.
 
 const AUTOPROMO_RE = /autopromo_replay/i;
 
@@ -12,9 +13,6 @@ function extractEpisodes() {
     const mp3El = el.querySelector('[data-mp3]');
     if (!num || !titleEl || !mp3El) continue;
 
-    // EpTitle contains a leading nested <div> with the number (rendered as
-    // text), then the title. textContent gives "  1L'attente des femmes  " —
-    // strip the leading number, collapse whitespace.
     let title = titleEl.textContent
       .replace(/^\s*\d+\s*/, '')
       .replace(/\s+/g, ' ')
@@ -28,17 +26,20 @@ function extractEpisodes() {
   return episodes;
 }
 
-function pad3(n) {
-  return String(n).padStart(3, '0');
-}
+function pad3(n) { return String(n).padStart(3, '0'); }
 
 function sanitizeFilename(name) {
-  // chrome.downloads.download rejects \ / : * ? " < > | and reserved names.
   return name.replace(/[\\/:*?"<>|]/g, '-');
 }
 
+function pageSlug() {
+  // e.g. /podcast/france-culture/1907/les-pieds-sur-terre/reportage
+  const m = location.pathname.match(/\/podcast\/[^/]+\/[^/]+\/([^/]+)/);
+  return m ? m[1].toLowerCase() : 'podcast-episodes';
+}
+
 let panel = null;
-let progressLine = null;
+let statusLine = null;
 
 function ensurePanel() {
   if (panel) return panel;
@@ -53,12 +54,12 @@ function ensurePanel() {
 
   const title = document.createElement('div');
   title.textContent = 'Téléchargement des épisodes';
-  title.style.cssText = 'font-weight:600;margin-bottom:8px';
+  title.style.cssText = 'font-weight:600;margin-bottom:6px';
   panel.appendChild(title);
 
-  progressLine = document.createElement('div');
-  progressLine.style.cssText = 'font-size:12px;opacity:0.85';
-  panel.appendChild(progressLine);
+  statusLine = document.createElement('div');
+  statusLine.style.cssText = 'font-size:12px;opacity:0.85';
+  panel.appendChild(statusLine);
 
   const btn = document.createElement('button');
   btn.id = '__lps_dl_btn';
@@ -66,7 +67,7 @@ function ensurePanel() {
   btn.style.cssText = [
     'display:block', 'margin-top:10px', 'background:#fff', 'color:#111',
     'border:none', 'padding:8px 12px', 'border-radius:6px', 'cursor:pointer',
-    'font-weight:600', 'width:100%'
+    'font-weight:600', 'width:100%', 'font-size:13px'
   ].join(';');
   btn.addEventListener('click', startDownload);
   panel.appendChild(btn);
@@ -75,34 +76,41 @@ function ensurePanel() {
   return panel;
 }
 
-function setProgress(msg) {
+function setStatus(msg) {
   ensurePanel();
-  if (progressLine) progressLine.textContent = msg;
+  if (statusLine) statusLine.textContent = msg;
 }
 
 async function startDownload() {
   const episodes = extractEpisodes();
   if (episodes.length === 0) {
-    setProgress('Aucun épisode détecté sur cette page.');
+    setStatus('Aucun épisode détecté sur cette page.');
     return { ok: 0, total: 0 };
   }
-  setProgress(`0 / ${episodes.length} envoyés à Chrome…`);
 
   const items = episodes.map(ep => ({
     url: ep.url,
     filename: sanitizeFilename(`${pad3(ep.num)} - ${ep.title}.mp3`)
   }));
 
-  const resp = await chrome.runtime.sendMessage({ action: 'downloadAll', items });
-  setProgress(`${resp.ok} / ${episodes.length} démarrés (échecs: ${resp.failed})`);
+  setStatus(`Ouverture de l'onglet de téléchargement (${items.length} épisodes)…`);
+  const resp = await chrome.runtime.sendMessage({
+    action: 'openDownloader',
+    episodes: items,
+    slug: pageSlug()
+  });
+  if (resp && resp.ok) {
+    setStatus(`Onglet ouvert : ${resp.count} épisodes prêts à archiver.`);
+  } else {
+    setStatus("Erreur lors de l'ouverture de l'onglet.");
+  }
   return resp;
 }
 
-// Listen for popup-triggered start.
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg && msg.action === 'startDownload') {
     startDownload().then(sendResponse);
-    return true; // async response
+    return true;
   }
   if (msg && msg.action === 'countEpisodes') {
     sendResponse({ count: extractEpisodes().length });
@@ -110,7 +118,6 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
 });
 
-// Inject the floating button as soon as the DOM is idle.
 ensurePanel();
 const count = extractEpisodes().length;
-setProgress(`${count} épisode${count > 1 ? 's' : ''} détecté${count > 1 ? 's' : ''}.`);
+setStatus(`${count} épisode${count > 1 ? 's' : ''} détecté${count > 1 ? 's' : ''}.`);

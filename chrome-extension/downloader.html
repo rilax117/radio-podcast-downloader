@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Télécharger les épisodes</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 28px; max-width: 720px; }
+    h1 { font-size: 20px; margin: 0 0 8px; }
+    .lead { color: #666; margin: 0 0 18px; }
+    button { padding: 10px 16px; background: #111; color: #fff; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .progress { height: 6px; background: #e5e5e5; border-radius: 3px; margin-top: 14px; overflow: hidden; }
+    .progress-bar { height: 100%; background: #111; width: 0%; transition: width 0.3s; }
+    #status { margin-top: 10px; font-size: 13px; color: #444; min-height: 1.4em; }
+    .err { color: #b00020; }
+    .ok { color: #0a7f1c; }
+    #log { margin-top: 16px; font-size: 12px; max-height: 380px; overflow-y: auto; background: #f7f7f7; padding: 10px 12px; border-radius: 6px; font-family: ui-monospace, "SF Mono", monospace; white-space: pre-wrap; word-break: break-word; }
+    #log div { padding: 1px 0; }
+    @media (prefers-color-scheme: dark) {
+      body { background: #1c1c1e; color: #eee; }
+      .lead { color: #aaa; }
+      button { background: #fff; color: #111; }
+      .progress { background: #333; }
+      .progress-bar { background: #fff; }
+      #log { background: #2a2a2c; }
+      #status { color: #ccc; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Télécharger les épisodes</h1>
+  <p class="lead" id="summary">Chargement…</p>
+  <button id="start">Choisir l'emplacement et démarrer</button>
+  <div class="progress"><div id="bar" class="progress-bar"></div></div>
+  <div id="status"></div>
+  <div id="log"></div>
+  <script type="module" src="downloader.js"></script>
+</body>
+</html>

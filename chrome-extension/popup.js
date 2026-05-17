@@ -33,15 +33,15 @@ async function init() {
 
 btn.addEventListener('click', async () => {
   btn.disabled = true;
-  setStatus('Démarrage des téléchargements…');
+  setStatus("Ouverture de l'onglet de téléchargement…");
   const tab = await getActiveTab();
   try {
     const resp = await chrome.tabs.sendMessage(tab.id, { action: 'startDownload' });
-    if (resp) {
-      setStatus(`${resp.ok} démarrés, ${resp.failed} échecs (sur ${resp.total}).`,
-        resp.failed > 0);
+    if (resp && resp.ok) {
+      setStatus(`${resp.count} épisodes prêts dans le nouvel onglet.`);
+      window.close();
     } else {
-      setStatus('Pas de réponse du content script.', true);
+      setStatus('Erreur lors de la préparation.', true);
     }
   } catch (e) {
     setStatus(`Erreur: ${e.message}`, true);

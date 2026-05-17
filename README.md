@@ -19,10 +19,13 @@ Les trois produisent des fichiers nommés `NNN - Titre.mp3` (numéro paddé sur 
 ├── download_episodes.sh          # Livrable 2 — Bash + curl
 ├── chrome-extension/             # Livrable 3 — Extension Chrome
 │   ├── manifest.json
-│   ├── content.js                #   Extraction DOM + bouton injecté
-│   ├── background.js             #   Service worker, orchestration chrome.downloads
-│   ├── popup.html
-│   └── popup.js
+│   ├── content.js                #   Extraction DOM + bouton injecté sur la page
+│   ├── background.js             #   Service worker, ouvre l'onglet de téléchargement
+│   ├── popup.html                #   Popup toolbar (alternative au bouton injecté)
+│   ├── popup.js
+│   ├── downloader.html           #   Page dédiée qui fait le fetch + ZIP streaming
+│   ├── downloader.js
+│   └── zip-writer.js             #   ZIP streaming maison (STORE, data descriptors)
 └── mp3/                          # Sortie des téléchargements (gitignored, ~2.7 GB)
 ```
 
@@ -69,12 +72,26 @@ Parsing par `perl -0777` (slurp + regex multi-ligne) pour gérer titres sur plus
 
 L'extension s'active sur toute page `radio-podcast.fr/podcast/*` (pas seulement Les Pieds sur Terre — fonctionne pour n'importe quelle série du site).
 
-Deux façons de déclencher :
+**Deux façons de déclencher**, qui mènent au même flot :
 
 - **Bouton flottant** : un panneau apparaît en haut à droite de la page avec le nombre d'épisodes détectés et un bouton « Télécharger tous les épisodes ».
 - **Popup toolbar** : cliquer l'icône de l'extension dans la barre Chrome.
 
-Les téléchargements partent vers le dossier Downloads par défaut de Chrome. Le filtre `autopromo_replay` exclut automatiquement les épisodes promotionnels.
+**Flot** (un seul fichier `.zip` au final, pas 101 entrées dans Chrome) :
+
+1. Tu cliques le bouton → un nouvel onglet s'ouvre avec la page de téléchargement.
+2. Tu cliques « Choisir l'emplacement et démarrer » → dialogue système pour choisir où enregistrer le `.zip`.
+3. L'onglet télécharge chaque mp3 et l'écrit en streaming dans le zip (pas de RAM saturée, même pour 2.7 GB).
+4. À la fin, tu as **un seul fichier** (ex: `les-pieds-sur-terre.zip`) contenant les 101 mp3 nommés `NNN - Titre.mp3`.
+
+Le filtre `autopromo_replay` exclut automatiquement les épisodes promotionnels.
+
+**Détails techniques :**
+
+- Le zip est en mode STORE (pas de compression) — les mp3 sont déjà compressés.
+- Utilise [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API) (`showSaveFilePicker`) pour streamer directement vers le disque.
+- L'implémentation ZIP utilise les *data descriptors* (general purpose flag bit 3) pour écrire les en-têtes sans connaître la taille à l'avance — chaque mp3 traverse le pipeline sans jamais être bufferisé entièrement.
+- Format ZIP 32-bit (limite à 4 GB par archive, fits ici).
 
 ## Convention de nommage
 
