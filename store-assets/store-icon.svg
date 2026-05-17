@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Chrome Web Store icon: 128x128 with 12px transparent padding on each side.
+       Inner artwork area: 104x104 centered. Background transparent (renders the
+       rounded square only, so the icon doesn't look pasted on dark store theme). -->
+
+  <!-- Rounded square background (inset by 12px) -->
+  <rect x="12" y="12" width="104" height="104" rx="20" ry="20" fill="#111111"/>
+
+  <!-- Download glyph, scaled to fit inside the 104x104 inner area.
+       Original artwork was on 128 canvas: shaft (54,28,20,50), arrowhead (34,68)-(94,68)-(64,102),
+       tray (28,106,72,8). Scale by 104/128 = 0.8125 and translate by (12,12). -->
+  <g transform="translate(12,12) scale(0.8125)">
+    <!-- Shaft -->
+    <rect x="54" y="28" width="20" height="50" fill="#ffffff"/>
+    <!-- Arrowhead (triangle) -->
+    <polygon points="34,68 94,68 64,102" fill="#ffffff"/>
+    <!-- Tray (horizontal bar below arrow) -->
+    <rect x="28" y="106" width="72" height="8" rx="2" ry="2" fill="#ffffff"/>
+  </g>
+</svg>
