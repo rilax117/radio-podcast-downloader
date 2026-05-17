@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Rounded square background -->
+  <rect width="128" height="128" rx="24" ry="24" fill="#111111"/>
+  <!-- Download arrow (centered, white) -->
+  <!-- Shaft -->
+  <rect x="54" y="28" width="20" height="50" fill="#ffffff"/>
+  <!-- Arrowhead (triangle) -->
+  <polygon points="34,68 94,68 64,102" fill="#ffffff"/>
+  <!-- Tray (horizontal bar below arrow) -->
+  <rect x="28" y="106" width="72" height="8" rx="2" ry="2" fill="#ffffff"/>
+</svg>

@@ -3,7 +3,12 @@
   "name": "Télécharger tous les épisodes",
   "version": "1.1.0",
   "description": "Télécharge en lot tous les épisodes mp3 d'une page radio-podcast.fr en un seul fichier .zip",
-  "permissions": ["storage", "activeTab", "scripting"],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": ["storage", "activeTab"],
   "host_permissions": [
     "https://radio-podcast.fr/*",
     "https://*.radiofrance.fr/*",
@@ -11,7 +16,12 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Télécharger les épisodes"
+    "default_title": "Télécharger les épisodes",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
   },
   "content_scripts": [
     {

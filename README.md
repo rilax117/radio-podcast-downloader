@@ -24,7 +24,11 @@ Les trois produisent des fichiers nommés `NNN - Titre.mp3` (numéro paddé sur 
 │   ├── popup.js
 │   ├── downloader.html           #   Page dédiée qui fait le fetch + ZIP streaming
 │   ├── downloader.js
-│   └── zip-writer.js             #   ZIP streaming maison (STORE, data descriptors)
+│   ├── zip-writer.js             #   ZIP streaming maison (STORE, data descriptors)
+│   └── icons/                    #   icon.svg + icon-{16,48,128}.png
+├── scripts/
+│   └── build-extension.sh        # Build dist/extension-webstore.zip + dist/extension.crx
+├── PRIVACY.md                    # Politique de confidentialité (Web Store)
 ├── _archives/                    # Scratch / sample HTML (gitignored)
 └── mp3/                          # Sortie des téléchargements (gitignored, ~2.7 GB)
 ```
@@ -64,10 +68,49 @@ Parsing par `perl -0777` (slurp + regex multi-ligne) pour gérer titres sur plus
 
 ### Installation
 
-1. Ouvrir `chrome://extensions/`
-2. Activer le **Mode développeur** (toggle en haut à droite)
-3. Cliquer **« Charger l'extension non empaquetée »**
-4. Sélectionner le dossier [chrome-extension/](chrome-extension/)
+**En attendant la publication sur le Chrome Web Store**, deux options pour installer maintenant :
+
+**Option 1 — Mode développeur (à partir du source)** :
+1. Cloner ce repo ou télécharger l'archive `dist/extension-webstore.zip` (générée par `scripts/build-extension.sh`) puis la décompresser
+2. Ouvrir `chrome://extensions/`
+3. Activer le **Mode développeur** (toggle en haut à droite)
+4. Cliquer **« Charger l'extension non empaquetée »**
+5. Sélectionner le dossier [chrome-extension/](chrome-extension/)
+
+**Option 2 — `.crx` signé** : possible mais Chrome bloque l'installation hors Web Store depuis 2018. L'Option 1 est plus simple.
+
+### Build / packaging
+
+```bash
+./scripts/build-extension.sh
+```
+
+Produit deux artefacts dans `dist/` (gitignored) :
+- `extension-webstore.zip` — à uploader sur le Chrome Web Store
+- `extension.crx` — version signée (si une `.pem` est présente à la racine, voir ci-dessous)
+
+### Publication Chrome Web Store
+
+Voir [PRIVACY.md](PRIVACY.md) pour la politique de confidentialité (à publier en URL avant la soumission).
+
+Étapes manuelles :
+1. Compte développeur sur https://chrome.google.com/webstore/devconsole/ (frais one-time $5)
+2. « Add new item » → uploader `dist/extension-webstore.zip`
+3. Remplir la fiche : description, catégorie (Productivity), screenshots 1280×800, URL de la privacy policy
+4. Justifier les permissions :
+   - `storage` → passer la liste d'épisodes entre onglets via `chrome.storage.session`
+   - `activeTab` → compter les épisodes détectés depuis le popup
+   - `host_permissions` (`*.radiofrance.fr`, `*.radiofrance-podcast.net`) → fetch des mp3 publics Radio France
+5. Soumettre — review ~1-3 jours.
+
+### Clé privée (`.pem`)
+
+Le fichier `chrome-extension.pem` (généré par Chrome « Pack extension ») est la **clé privée de signature**. Elle est gitignorée et ne doit jamais quitter ton disque :
+- Quiconque l'a peut publier des mises à jour de ton extension hors-store.
+- Si tu la perds, tu ne peux plus mettre à jour les installations existantes du `.crx` (l'ID est dérivé de la clé).
+- Recommandé : backup dans un gestionnaire de mots de passe (1Password / iCloud Keychain).
+
+Le Web Store n'utilise PAS cette `.pem` — il re-signe l'extension avec sa propre clé à l'upload.
 
 ### Utilisation
 
