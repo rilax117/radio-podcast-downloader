@@ -26,9 +26,9 @@ mv store-icon.svg.png store-icon-128.png
 
 | Fichier | Description | Statut |
 |---|---|---|
+| `screenshot-download-button-on-page.png` | Bouton flottant injecté sur la page d'index du podcast | ✅ 1280×800 PNG |
 | `screenshot-download-in-progress.jpg` | Page de l'onglet downloader en cours de téléchargement (barre de progression + checklist) | ✅ 1280×800 JPEG |
-| `screenshot-button-on-page.jpg` | Le bouton flottant injecté sur une page radio-podcast.fr | 🔲 À refaire |
-| `screenshot-downloader-tab.jpg` | L'onglet downloader avant clic démarrer (titre + bouton « Choisir l'emplacement… ») | 🔲 À refaire |
+| `screenshot-downloader-tab.jpg` | L'onglet downloader avant clic démarrer (titre + bouton « Choisir l'emplacement… ») | 🔲 Optionnel (3ᵉ) |
 
 **Conseils pour les captures à refaire** :
 - Sur macOS : Cmd+Shift+4 puis sélection → fichier `.png` créé sur le Bureau.

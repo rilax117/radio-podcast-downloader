@@ -33,3 +33,4 @@ dist/
 
 # Internal notes / TODOs / personal roadmap (operational, not for public repo)
 plan.md
+.secret/

@@ -4,6 +4,8 @@
 [![Chrome Extension](https://img.shields.io/badge/Chrome-MV3-blue.svg)](chrome-extension/manifest.json)
 [![Privacy policy](https://img.shields.io/badge/Privacy-public-green.svg)](https://rilax117.github.io/radio-podcast-downloader/PRIVACY)
 
+🇫🇷 Français · [🇬🇧 English version](#english-version)
+
 > Télécharger en lot tous les épisodes d'un podcast [radio-podcast.fr](https://radio-podcast.fr) dans **un seul fichier `.zip`**.
 
 Trois outils interchangeables :
@@ -128,5 +130,138 @@ Produit dans `dist/` :
 L'extension ne collecte, ne stocke et ne transmet aucune donnée personnelle. Voir [PRIVACY.md](PRIVACY.md) ou la version publiée : https://rilax117.github.io/radio-podcast-downloader/PRIVACY
 
 ## Licence
+
+[MIT](LICENSE) © 2026 rilax117
+
+---
+
+<a id="english-version"></a>
+
+# Radio Podcast Downloader
+
+🇬🇧 English · [🇫🇷 Version française](#radio-podcast-downloader)
+
+> Bulk-download every episode of a [radio-podcast.fr](https://radio-podcast.fr) podcast into **a single `.zip` file**.
+
+Three interchangeable tools:
+
+- 🌐 **Chrome extension** — one button on the page, one "where to save" prompt, one `.zip`.
+- 🐍 **Python script** — `python3 scripts/download_episodes.py`, zero external dependencies.
+- 🐚 **Bash + curl script** — `./scripts/download_episodes.sh`, self-contained.
+
+![Downloader tab in progress](store-assets/screenshot-download-in-progress.jpg)
+
+## Why?
+
+The site [radio-podcast.fr](https://radio-podcast.fr) lists hundreds of episodes per podcast (France Culture, France Inter, etc.), each downloadable individually. For a 100+ episode series, that's 100+ clicks and 100+ entries in Chrome's downloads bar.
+
+This tool does the job in a single operation: it extracts URLs from the DOM, downloads every mp3, and packs them **as a stream** into a single ZIP archive with readable filenames like `001 - Title.mp3`.
+
+## Installation
+
+### Chrome extension
+
+> ⏳ Chrome Web Store publication is pending review.
+
+In the meantime, manual install (developer mode):
+
+1. Clone this repo or download the [latest ZIP](https://github.com/rilax117/radio-podcast-downloader/archive/refs/heads/main.zip) and extract it.
+2. Open `chrome://extensions/`.
+3. Enable **Developer mode** (toggle, top right).
+4. Click **"Load unpacked"** → select the [`chrome-extension/`](chrome-extension/) directory.
+
+### Python / Bash scripts
+
+Nothing to install — both scripts only use tools preinstalled on macOS (Python 3, Bash, curl, perl).
+
+## Usage
+
+### Chrome extension
+
+The extension activates on **any** `radio-podcast.fr/podcast/*` page (not just *Les Pieds sur Terre* — works for any series on the site).
+
+1. Open a podcast's index page.
+2. Click **"Télécharger tous les épisodes"** (floating panel top-right, or popup icon in the toolbar).
+3. A new tab opens → click **"Choisir l'emplacement et démarrer"**.
+4. Pick where to save the `.zip` → the archive is built as a stream.
+
+You get **a single file** `podcast-name.zip` containing all the mp3s named `NNN - Title.mp3`.
+
+### Python script
+
+```bash
+python3 scripts/download_episodes.py                       # auto-finds local HTML
+python3 scripts/download_episodes.py path/to/page.html     # or explicit path
+```
+
+The script looks for an HTML file in `./` or `./_archives/` (saved from the browser by you), extracts the episodes, and downloads everything into `./mp3/`. Idempotent.
+
+### Bash + curl script
+
+```bash
+./scripts/download_episodes.sh                              # re-fetch from radio-podcast.fr
+./scripts/download_episodes.sh path/to/page.html            # parse a local file
+./scripts/download_episodes.sh -o ./other-folder            # custom output dir
+```
+
+## How it works
+
+### Single-ZIP streaming (extension)
+
+The extension fetches each mp3 and pipes the bytes directly into a `.zip` file the user chose via [`showSaveFilePicker`](https://developer.mozilla.org/en-US/docs/Web/API/Window/showSaveFilePicker), through a [hand-rolled ZIP writer](chrome-extension/zip-writer.js) (STORE mode, *data descriptors*).
+
+Memory usage stays bounded: no file is ever fully buffered in RAM, even for multi-GB archives.
+
+### Filename convention
+
+`NNN - Title.mp3`:
+
+- Number zero-padded to 3 digits
+- OS-unsafe characters replaced: `/` → `-` ; `:` → ` -`
+- HTML entities decoded (`&nbsp;`, `&amp;`, `&#39;`, …)
+- Curly apostrophes and accents preserved
+
+### Extension architecture
+
+| File | Role |
+|---|---|
+| [`content.js`](chrome-extension/content.js) | Injected on `radio-podcast.fr/podcast/*` pages; floating button + DOM extraction of `data-mp3` |
+| [`popup.js`](chrome-extension/popup.js) | Alternative UI via the toolbar icon |
+| [`background.js`](chrome-extension/background.js) | Service worker, opens the download tab with the episode list |
+| [`downloader.html`](chrome-extension/downloader.html) + [`downloader.js`](chrome-extension/downloader.js) | Dedicated page that fetches + streams the ZIP via `showSaveFilePicker` |
+| [`zip-writer.js`](chrome-extension/zip-writer.js) | Hand-rolled ZIP writer (STORE, data descriptors, UTF-8) |
+
+## Development
+
+### Build the extension
+
+```bash
+./scripts/build-extension.sh
+```
+
+Produces in `dist/`:
+- `extension-webstore.zip` — to upload to the Chrome Web Store
+- `extension.crx` — signed version for private distribution (requires a local `chrome-extension.pem`)
+
+### Project layout
+
+```
+.
+├── README.md                  # This file
+├── LICENSE                    # MIT
+├── PRIVACY.md                 # Privacy policy (Web Store)
+├── chrome-extension/          # Extension sources (MV3)
+├── scripts/
+│   ├── build-extension.sh     # Build artifacts into dist/
+│   ├── download_episodes.py   # Python script
+│   └── download_episodes.sh   # Bash + curl script
+└── store-assets/              # Icon + screenshots for the Web Store listing
+```
+
+## Privacy
+
+The extension does not collect, store, or transmit any personal data. See [PRIVACY.md](PRIVACY.md) or the published version: https://rilax117.github.io/radio-podcast-downloader/PRIVACY
+
+## License
 
 [MIT](LICENSE) © 2026 rilax117
