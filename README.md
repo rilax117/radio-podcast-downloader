@@ -91,7 +91,7 @@ Produit deux artefacts dans `dist/` (gitignored) :
 
 ### Publication Chrome Web Store
 
-Voir [PRIVACY.md](PRIVACY.md) pour la politique de confidentialité (à publier en URL avant la soumission).
+Politique de confidentialité publiée à : **https://rilax117.github.io/radio-podcast-downloader/PRIVACY** (source : [PRIVACY.md](PRIVACY.md))
 
 Étapes manuelles :
 1. Compte développeur sur https://chrome.google.com/webstore/devconsole/ (frais one-time $5)

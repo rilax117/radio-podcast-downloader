@@ -35,8 +35,10 @@ L'archive `.zip` finale est enregistrée sur le disque de l'utilisateur à l'emp
 
 ## Code source
 
-Le code source complet est public et auditable. Cette page de politique de confidentialité reflète exactement le comportement du code.
+Le code source complet est public et auditable à : https://github.com/rilax117/radio-podcast-downloader
+
+Cette page de politique de confidentialité reflète exactement le comportement du code.
 
 ## Contact
 
-Pour toute question : ouvrir une issue sur le dépôt source.
+Pour toute question : ouvrir une issue sur https://github.com/rilax117/radio-podcast-downloader/issues
