@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Télécharger tous les épisodes",
+  "version": "1.0.0",
+  "description": "Télécharge en lot tous les épisodes mp3 d'une page radio-podcast.fr",
+  "permissions": ["downloads", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://radio-podcast.fr/*",
+    "https://*.radiofrance.fr/*",
+    "https://*.radiofrance-podcast.net/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Télécharger les épisodes"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://radio-podcast.fr/podcast/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

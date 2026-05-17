@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Télécharger les épisodes</title>
+  <style>
+    body { font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; width: 280px; padding: 14px; }
+    h1 { font-size: 14px; margin: 0 0 8px; }
+    p { margin: 0 0 10px; color: #555; }
+    button { width: 100%; padding: 8px 12px; background: #111; color: #fff; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    #status { margin-top: 10px; font-size: 12px; color: #333; min-height: 1.4em; }
+    .err { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>Télécharger les épisodes</h1>
+  <p>Détecte les épisodes mp3 sur la page courante et les télécharge tous.</p>
+  <button id="go">Télécharger tous les épisodes</button>
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
