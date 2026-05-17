@@ -20,3 +20,8 @@ __pycache__/
 # Editor
 .vscode/
 .idea/
+
+_archives/
+
+# Packaged extension build (regenerated from chrome-extension/)
+chrome-extension.zip

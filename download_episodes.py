@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Download all "Les Pieds sur Terre" episodes from a local HTML dump.
 
-Parses `liste-podcast copy.html`, extracts (episode_number, title, mp3_url)
-for each `<div class="PodcastEpisode">`, skips episode 102 (autopromo),
-and downloads each mp3 into ./mp3/ as "NNN - Title.mp3".
+Usage:
+    python3 download_episodes.py [path/to/page.html]
 
-Idempotent: skips files that already exist on disk.
+Defaults to searching for a podcast list HTML file in the current dir and in
+./_archives/. Extracts (episode_number, title, mp3_url) from each
+`<div class="PodcastEpisode">`, skips episode 102 (autopromo), and downloads
+each mp3 into ./mp3/ as "NNN - Title.mp3". Idempotent.
 """
 from __future__ import annotations
 
@@ -18,7 +20,12 @@ import time
 from html.parser import HTMLParser
 from pathlib import Path
 
-HTML_FILE = Path("liste-podcast copy.html")
+DEFAULT_HTML_CANDIDATES = [
+    Path("liste-podcast copy.html"),
+    Path("liste-podcast.html"),
+    Path("_archives/liste-podcast copy.html"),
+    Path("_archives/liste-podcast.html"),
+]
 OUT_DIR = Path("mp3")
 SKIP_IDS = {"102"}
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
@@ -150,13 +157,30 @@ def download(url: str, dest: Path) -> int:
     return dest.stat().st_size
 
 
+def resolve_html_path(argv: list[str]) -> Path | None:
+    if len(argv) > 1:
+        p = Path(argv[1])
+        return p if p.exists() else None
+    for candidate in DEFAULT_HTML_CANDIDATES:
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def main() -> int:
-    if not HTML_FILE.exists():
-        print(f"error: {HTML_FILE} not found", file=sys.stderr)
+    html_path = resolve_html_path(sys.argv)
+    if html_path is None:
+        print(
+            "error: no HTML file found.\n"
+            "  pass a path as argument, or place one of these in the cwd:\n  - "
+            + "\n  - ".join(str(p) for p in DEFAULT_HTML_CANDIDATES),
+            file=sys.stderr,
+        )
         return 1
+    print(f"Reading: {html_path}")
 
     parser = EpisodeParser()
-    parser.feed(HTML_FILE.read_text(encoding="utf-8"))
+    parser.feed(html_path.read_text(encoding="utf-8"))
 
     episodes = [e for e in parser.episodes if e["num"] not in SKIP_IDS]
     print(f"Extracted {len(episodes)} episodes (skipped {len(parser.episodes) - len(episodes)})")

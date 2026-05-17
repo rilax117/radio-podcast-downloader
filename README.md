@@ -14,7 +14,6 @@ Les trois produisent des fichiers nommés `NNN - Titre.mp3` (numéro paddé sur 
 .
 ├── README.md
 ├── .gitignore
-├── liste-podcast copy.html       # Sample HTML page (input pour les scripts en mode local)
 ├── download_episodes.py          # Livrable 1 — Python (validation)
 ├── download_episodes.sh          # Livrable 2 — Bash + curl
 ├── chrome-extension/             # Livrable 3 — Extension Chrome
@@ -26,16 +25,18 @@ Les trois produisent des fichiers nommés `NNN - Titre.mp3` (numéro paddé sur 
 │   ├── downloader.html           #   Page dédiée qui fait le fetch + ZIP streaming
 │   ├── downloader.js
 │   └── zip-writer.js             #   ZIP streaming maison (STORE, data descriptors)
+├── _archives/                    # Scratch / sample HTML (gitignored)
 └── mp3/                          # Sortie des téléchargements (gitignored, ~2.7 GB)
 ```
 
 ## Livrable 1 — Script Python
 
 ```bash
-python3 download_episodes.py
+python3 download_episodes.py                            # auto-trouve le HTML
+python3 download_episodes.py path/vers/page.html        # ou chemin explicite
 ```
 
-Lit `liste-podcast copy.html` à la racine, télécharge les 101 épisodes dans `mp3/` via `curl` (subprocess). Idempotent : skip les fichiers déjà présents. Aucune dépendance externe (stdlib uniquement).
+Cherche un fichier HTML de liste d'épisodes (par défaut : `./liste-podcast copy.html` puis `./_archives/liste-podcast copy.html`), télécharge les 101 épisodes dans `mp3/` via `curl` (subprocess — évite le problème de CA bundle macOS sur `urllib`). Idempotent. Aucune dépendance externe (stdlib uniquement).
 
 Sortie attendue :
 
@@ -50,9 +51,9 @@ Done. downloaded=101 skipped=0 failed=0 total=2.6 GB
 ## Livrable 2 — Script Bash + curl
 
 ```bash
-./download_episodes.sh                            # re-fetch la page depuis radio-podcast.fr
-./download_episodes.sh "liste-podcast copy.html"  # parse un fichier HTML local
-./download_episodes.sh -o ./autre-dossier         # destination custom (défaut: ./mp3)
+./download_episodes.sh                                       # re-fetch depuis radio-podcast.fr
+./download_episodes.sh "_archives/liste-podcast copy.html"   # parse un fichier HTML local
+./download_episodes.sh -o ./autre-dossier                    # destination custom (défaut: ./mp3)
 ```
 
 Dépendances : `bash`, `curl`, `perl` (tous préinstallés sur macOS).
