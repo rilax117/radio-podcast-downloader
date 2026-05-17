@@ -13,7 +13,10 @@ set -euo pipefail
 
 INDEX_URL="https://radio-podcast.fr/podcast/france-culture/1907/les-pieds-sur-terre/reportage"
 UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
-OUT_DIR="./mp3"
+# Default output relative to the project root (script lives in scripts/), so
+# it works regardless of where the user invokes it from.
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+OUT_DIR="$PROJECT_ROOT/mp3"
 SKIP_IDS=("102")
 
 usage() {

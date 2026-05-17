@@ -20,13 +20,16 @@ import time
 from html.parser import HTMLParser
 from pathlib import Path
 
+# Paths anchored to the project root (script lives in scripts/), so the user
+# can invoke it from anywhere.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_HTML_CANDIDATES = [
-    Path("liste-podcast copy.html"),
-    Path("liste-podcast.html"),
-    Path("_archives/liste-podcast copy.html"),
-    Path("_archives/liste-podcast.html"),
+    PROJECT_ROOT / "liste-podcast copy.html",
+    PROJECT_ROOT / "liste-podcast.html",
+    PROJECT_ROOT / "_archives" / "liste-podcast copy.html",
+    PROJECT_ROOT / "_archives" / "liste-podcast.html",
 ]
-OUT_DIR = Path("mp3")
+OUT_DIR = PROJECT_ROOT / "mp3"
 SKIP_IDS = {"102"}
 USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 

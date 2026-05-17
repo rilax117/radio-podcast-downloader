@@ -30,3 +30,6 @@ dist/
 
 # Private signing key — NEVER commit (controls publishing rights)
 *.pem
+
+# Internal notes / TODOs / personal roadmap (operational, not for public repo)
+plan.md
